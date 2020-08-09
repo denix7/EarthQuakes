@@ -37,6 +37,18 @@ public class EarthQuakeClient {
    
         return answer;
     }
+    
+    public ArrayList<QuakeEntry> filterByDepth(ArrayList<QuakeEntry> quakeData, double minDepth, double maxDepth){
+        ArrayList<QuakeEntry> answer = new ArrayList<QuakeEntry>();
+        
+        for(QuakeEntry current : quakeData)
+        {
+            if(current.getDepth() > minDepth && current.getDepth() < maxDepth)
+                answer.add(current);
+        }
+        
+        return answer;
+    }
 
     public void dumpCSV(ArrayList<QuakeEntry> list){
         System.out.println("Latitude,Longitude,Magnitude,Info");
@@ -71,7 +83,7 @@ public class EarthQuakeClient {
         //String source = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.atom";
         String source = "data/nov20quakedatasmall.atom";
         ArrayList<QuakeEntry> list  = parser.read(source);
-        System.out.println("read data for "  +" quakes");
+        System.out.println("read data for " + list.size() + " quakes");
         
         // This location is Durham, NC
         //Location city = new Location(35.988, -78.907);
@@ -80,7 +92,7 @@ public class EarthQuakeClient {
          Location city =  new Location(38.17, -118.82);
 
         // TODO
-        int distMax = 1000000;
+        int distMax = 1000000; //in metters
         ArrayList <QuakeEntry> filters = filterByDistanceFrom(list, distMax, city);
         
         for(QuakeEntry current : filters)
@@ -88,6 +100,25 @@ public class EarthQuakeClient {
             //System.out.println(current);
             double dist = current.getLocation().distanceTo(city);
             System.out.println(dist + " " + current.getInfo());
+        }
+        
+        System.out.println("Found " + filters.size() + " quakes that match that criteria");
+    }
+    
+    public void quakesOfDepth(){
+        EarthQuakeParser parser = new EarthQuakeParser();
+        String source = "data/nov20quakedatasmall.atom";
+        ArrayList<QuakeEntry> list = parser.read(source);
+        
+        System.out.println("read data for " + list.size() +" quakes");
+        
+        double min = -10000;
+        double max = -5000;
+        ArrayList<QuakeEntry> filters = filterByDepth(list, min, max);
+        
+        for(QuakeEntry qe : filters)
+        {
+            System.out.println(qe);
         }
         
         System.out.println("Found " + filters.size() + " quakes that match that criteria");
