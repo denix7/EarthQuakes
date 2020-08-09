@@ -49,6 +49,26 @@ public class EarthQuakeClient {
         
         return answer;
     }
+    
+    public ArrayList<QuakeEntry> filterByPhrase(ArrayList<QuakeEntry> quakeData, String where, String phrase)
+    {
+        ArrayList<QuakeEntry> answer = new ArrayList<QuakeEntry>();
+        
+        if(where.equals("start") || where.equals("end") || where.equals("any"))
+        {
+            
+            for(QuakeEntry current : quakeData)
+            {
+                if(where.equals("end") && current.getInfo().endsWith(phrase))
+                    answer.add(current);
+                else if(where.equals("start") && current.getInfo().startsWith(phrase))
+                    answer.add(current);
+                else if(where.equals("any") && current.getInfo().contains(phrase))
+                    answer.add(current);
+            }
+        }
+        return answer;
+    }
 
     public void dumpCSV(ArrayList<QuakeEntry> list){
         System.out.println("Latitude,Longitude,Magnitude,Info");
@@ -116,12 +136,31 @@ public class EarthQuakeClient {
         double max = -5000;
         ArrayList<QuakeEntry> filters = filterByDepth(list, min, max);
         
-        for(QuakeEntry qe : filters)
+        for(QuakeEntry current : filters)
         {
-            System.out.println(qe);
+            System.out.println(current);
         }
         
         System.out.println("Found " + filters.size() + " quakes that match that criteria");
+    }
+    
+    public void quakesByPhrase(){
+        EarthQuakeParser parser = new EarthQuakeParser();
+        String source = "data/nov20quakedatasmall.atom";
+        ArrayList<QuakeEntry> list = parser.read(source);
+        
+        System.out.println("read data for " + list.size() + " quakes");
+        
+        String where = "end";           //start
+        String phrase = "California";   //Explosion
+        ArrayList<QuakeEntry> filters = filterByPhrase(list, where, phrase);
+        
+        for(QuakeEntry current : filters)
+        {
+            System.out.println(current);
+        }
+        
+        System.out.println("Found " + filters.size() + " quakes that match " + phrase + " at " + where);
     }
 
     public void createCSV(){
